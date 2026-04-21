@@ -2,6 +2,8 @@
 
 A countries search app built with React, TanStack Query, Tailwind CSS, and shadcn/ui (base-ui). Search countries by name and view details (flag, coat of arms, currency, driving side) sourced from the [REST Countries API](https://restcountries.com/). On first load, the app uses IP-based geolocation to display the user's own country.
 
+## Live Demo
+- https://countries-app-two-gilt.vercel.app/
 ## Documentation (Technical decisions)
 - https://www.notion.so/Country-Explorer-Technical-Decisions-78d0535bff024629b652fd7ca18bd731
 
