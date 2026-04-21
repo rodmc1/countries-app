@@ -1,37 +1,46 @@
 import { useState } from 'react';
 import SearchInput from '@/components/country/SearchInput';
 import CountryDetail, { CountryDetailSkeleton } from '@/components/country/CountryDetail';
-import { useCountrySearch, useCountrySearchByFullName } from '@/hooks/useCountry';
+import { useCountrySearch, useCountrySearchByFullName, useUserCountry } from '@/hooks/useCountry';
 import { type Country } from '@/types/country';
 import { DataBoundary } from '../shared/DataBoundary';
 import { useQueryClient } from '@tanstack/react-query';
 
-function CountryDetailPanel({ countryName }: { countryName: string }) {
-  const { countryDetail, isFetching } = useCountrySearchByFullName(countryName);
+function CountryDetailPanel({ country }: { country: Country }) {
+  const needsFetch = !!country.name.common;
+  const { countryDetail, isFetching } = useCountrySearchByFullName(needsFetch ? country.name.common : '');
+  const display = needsFetch ? countryDetail : country;
 
-  if (!countryDetail) return <CountryDetailSkeleton />;
-  return <CountryDetail country={countryDetail} isLoading={isFetching} />;
+  if (!display) return <CountryDetailSkeleton />;
+  return <CountryDetail country={display} isLoading={isFetching} />;
 }
 
 export default function CountryExplorer() {
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [pinnedCountry, setPinnedCountry] = useState<Country | null>(null);
   const { countries, isFetching, isError, errorMessage } = useCountrySearch(query, !!selectedCountry);
+  const { country: userCountry } = useUserCountry();
+  const displayedCountry = pinnedCountry ?? userCountry;
 
   const handleInputChange = (value: string) => {
     setQuery(value);
-    // Only clear selection when the user actively types something different (not on synthetic empty events from base-ui)
-    if (selectedCountry && value.length > 0 && value !== selectedCountry.name.common) {
+    // Reset results
+    if (selectedCountry && value !== selectedCountry.name.common) {
       setSelectedCountry(null);
     }
+  };
+
+  const handleSelect = (country: Country) => {
+    setSelectedCountry(country);
+    setPinnedCountry(country);
   };
 
   const handleRetry = () => {
     queryClient.refetchQueries({ queryKey: ['countries', 'search'] });
   };
 
-  // When a country is selected, show it as the only item so re-opening the dropdown shows 1 result
   const displayItems = selectedCountry ? [selectedCountry] : countries;
 
   return (
@@ -42,12 +51,12 @@ export default function CountryExplorer() {
         isError={isError}
         errorMessage={errorMessage}
         onInputChange={handleInputChange}
-        onSelect={setSelectedCountry}
+        onSelect={handleSelect}
         onRetry={handleRetry}
       />
-      {selectedCountry && (
+      {displayedCountry && (
         <DataBoundary fallback={<CountryDetailSkeleton />}>
-          <CountryDetailPanel countryName={selectedCountry.name.common} />
+          <CountryDetailPanel country={displayedCountry} />
         </DataBoundary>
       )}
     </div>

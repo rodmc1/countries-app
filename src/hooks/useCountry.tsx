@@ -1,7 +1,7 @@
 import { useDebounce } from 'use-debounce';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { searchCountriesByName, getCountryByNameFullText } from '@/api/countries';
+import { searchCountriesByName, getCountryByNameFullText, getCountryByCode, getUserCountryCode } from '@/api/countries';
 import type { Country } from '@/types/country';
 
 function extractErrorMessage(error: unknown): string | undefined {
@@ -48,4 +48,23 @@ export function useCountrySearchByFullName(query: string) {
     isError,
     errorMessage: extractErrorMessage(error)
   };
+}
+
+export function useUserCountry() {
+  const { data: countryCode } = useQuery<string>({
+    queryKey: ['user', 'countryCode'],
+    queryFn: getUserCountryCode,
+    staleTime: Infinity,
+    retry: false
+  });
+
+  const { data: country, isFetching } = useQuery<Country>({
+    queryKey: ['countries', 'alpha', countryCode],
+    queryFn: () => getCountryByCode(countryCode!),
+    enabled: !!countryCode,
+    staleTime: 1000 * 60 * 10,
+    retry: false
+  });
+
+  return { country: country ?? null, isFetching };
 }

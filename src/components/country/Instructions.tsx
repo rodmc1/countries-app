@@ -1,18 +1,47 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { SearchIcon, MousePointerClickIcon, EyeIcon } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+
+const steps = [
+  {
+    icon: SearchIcon,
+    title: 'Search',
+    description: 'Type a country name in the search box.'
+  },
+  {
+    icon: MousePointerClickIcon,
+    title: 'Select',
+    description: 'Pick a result from the dropdown list.'
+  },
+  {
+    icon: EyeIcon,
+    title: 'Explore',
+    description: 'View its flag, coat of arms, currency, and driving side.'
+  }
+];
 
 export default function Instructions() {
   return (
-    <Card className="mb-6 border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30">
-      <CardContent className="flex gap-3 items-start pt-5">
-        <span className="text-blue-500 text-xl mt-0.5">&#9432;</span>
-        <div className="text-left">
-          <h2 className="text-base font-semibold text-blue-800 dark:text-blue-300 mb-1">How to use</h2>
-          <p className="text-sm text-blue-700 dark:text-blue-400 leading-relaxed">
-            Type a country name in the search box below. Select a result from the dropdown to view its official name,
-            currency, flag, coat of arms, and driving side.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+    <section aria-label="How to use" className="flex flex-col gap-3">
+      <h2 className="text-sm font-semibold text-foreground text-center">How it works</h2>
+      <ol className="grid gap-3 sm:grid-cols-3">
+        {steps.map((step, index) => (
+          <li key={step.title} className="contents">
+            <Card size="sm" className="flex flex-col items-center gap-3 py-5 text-center">
+              <div className="relative flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/20">
+                <step.icon className="size-4" />
+                <Label className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground shadow-sm">
+                  {index + 1}
+                </Label>
+              </div>
+              <div className="flex flex-col gap-1 px-4">
+                <p className="text-sm font-semibold text-foreground">{step.title}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{step.description}</p>
+              </div>
+            </Card>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }

@@ -1,11 +1,12 @@
 import { memo, useRef, useState } from 'react';
-import { SearchIcon } from 'lucide-react';
+import { SearchIcon, XIcon } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Country } from '@/types/country';
 import ErrorView from '@/components/shared/ErrorView';
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem } from '@/components/ui/combobox';
-import { InputGroupAddon } from '@/components/ui/input-group';
+import { InputGroupAddon, InputGroupButton } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SearchInputProps {
   items: Country[];
@@ -31,12 +32,12 @@ export default function SearchInput({
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
-  // base-ui fires synthetic onInputValueChange after selection and on open/close — this skips that one event
   const ignoreNextInputEvent = useRef(false);
   const lastUserValue = useRef('');
   const displayCountResults = !isFetching && isOpen && items.length > 0;
 
-  function handleInputChange(value: string) {
+  const handleInputChange = (value: string) => {
+    // skips event - base-ui fires synthetic onInputValueChange after selection
     if (ignoreNextInputEvent.current) {
       ignoreNextInputEvent.current = false;
       return;
@@ -44,22 +45,31 @@ export default function SearchInput({
     lastUserValue.current = value;
     setInputValue(value);
     onInputChange(value);
-  }
+  };
 
-  function handleOpenChange(open: boolean) {
+  const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
-    ignoreNextInputEvent.current = true;
-    if (!open) setInputValue(lastUserValue.current);
-  }
+    if (!open) {
+      ignoreNextInputEvent.current = true;
+      setInputValue(lastUserValue.current);
+    }
+  };
 
-  function handleValueChange(value: string | null) {
+  const handleValueChange = (value: string | null) => {
     const country = value ? items.find(c => c.name.common === value) : null;
     if (!country) return;
     ignoreNextInputEvent.current = true;
     lastUserValue.current = country.name.common;
     setInputValue(country.name.common);
     onSelect(country);
-  }
+  };
+
+  const handleClear = () => {
+    lastUserValue.current = '';
+    setInputValue('');
+    setIsOpen(false);
+    onInputChange('');
+  };
 
   return (
     <Combobox
@@ -72,22 +82,34 @@ export default function SearchInput({
       <div ref={anchorRef}>
         <ComboboxInput placeholder="Search a country..." className="w-full" autoFocus showTrigger={false}>
           <InputGroupAddon>{isFetching ? <Spinner size="sm" /> : <SearchIcon />}</InputGroupAddon>
-          {displayCountResults && (
+          {(displayCountResults || inputValue.length > 0) && (
             <InputGroupAddon align="inline-end">
-              <span className="text-xs text-muted-foreground pr-2 whitespace-nowrap">
-                {items.length} {items.length === 1 ? 'result' : 'results'}
-              </span>
+              {displayCountResults && (
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {items.length} {items.length === 1 ? 'Result' : 'Results'}
+                </span>
+              )}
+              {inputValue.length > 0 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InputGroupButton
+                        size="icon-xs"
+                        aria-label="Clear"
+                        onMouseDown={e => e.preventDefault()}
+                        onClick={handleClear}>
+                        <XIcon />
+                      </InputGroupButton>
+                    </TooltipTrigger>
+                    <TooltipContent className="pb-2">Clear</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </InputGroupAddon>
           )}
         </ComboboxInput>
       </div>
       <ComboboxContent anchor={anchorRef} className="min-w-0">
-        {isFetching && (
-          <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
-            <Spinner size="sm" />
-            Searching...
-          </div>
-        )}
         {!isFetching && isError && (
           <ErrorView
             error={new Error(errorMessage ?? 'Failed to fetch countries.')}
@@ -127,7 +149,7 @@ function VirtualCountryListImpl({ items }: { items: Country[] }) {
           const country = items[vItem.index];
           return (
             <div
-              key={country.name.official}
+              key={country.ccn3}
               style={{
                 position: 'absolute',
                 top: 0,
