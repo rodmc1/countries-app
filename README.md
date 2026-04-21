@@ -78,7 +78,7 @@ src/
 ## Architecture Notes
 
 - **Search flow** — `CountryExplorer` owns the query/selection state. `SearchInput` is a controlled combobox built on base-ui that filters synthetic input events from the underlying primitive.
-- **Initial country** — `useUserCountry` chains an IP lookup with a country lookup. `displayedCountry` is derived as `pinnedCountry ?? userCountry`, avoiding `useEffect` for state syncing.
+- **Initial country** — `useUserCountry` chains an IP lookup with a country lookup.
 - **No re-fetch on first render** — the geolocated country is fetched via the `/alpha/{code}` endpoint with all detail fields, so the detail panel can render it directly without an additional `fullText` request.
 - **Pagination** — REST Countries doesn't support pagination, so the result list is virtualised with `@tanstack/react-virtual` to stay performant on large result sets.
 - **Debounce** — search input is debounced 500 ms to avoid hitting the API on every keystroke.
