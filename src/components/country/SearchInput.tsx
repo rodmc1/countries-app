@@ -110,25 +110,37 @@ export default function SearchInput({
         </ComboboxInput>
       </div>
       <ComboboxContent anchor={anchorRef} className="min-w-0">
-        {!isFetching && isError && (
-          <ErrorView
-            error={new Error(errorMessage ?? 'Failed to fetch countries.')}
-            resetErrorBoundary={() => onRetry?.()}
-          />
-        )}
-        {!isFetching && !isError && (
-          <>
-            <ComboboxEmpty>
-              {inputValue.trim().length === 0
-                ? 'Please enter a country name to search.'
-                : 'No countries found. Try a different name.'}
-            </ComboboxEmpty>
-            <VirtualCountryList items={items} />
-          </>
-        )}
+        <ComboboxResults
+          query={inputValue}
+          items={items}
+          isFetching={isFetching}
+          isError={isError}
+          errorMessage={errorMessage}
+          onRetry={onRetry}
+        />
       </ComboboxContent>
     </Combobox>
   );
+}
+
+interface ComboboxResultsProps {
+  query: string;
+  items: Country[];
+  isFetching?: boolean;
+  isError?: boolean;
+  errorMessage?: string;
+  onRetry?: () => void;
+}
+
+function ComboboxResults({ query, items, isFetching, isError, errorMessage, onRetry }: ComboboxResultsProps) {
+  if (query.trim().length === 0) return <ComboboxEmpty>Type to search.</ComboboxEmpty>;
+  if (isError)
+    return (
+      <ErrorView error={new Error(errorMessage ?? 'Something went wrong.')} resetErrorBoundary={() => onRetry?.()} />
+    );
+  if (isFetching) return <ComboboxEmpty>Searching...</ComboboxEmpty>;
+  if (items.length === 0) return <ComboboxEmpty>No items found.</ComboboxEmpty>;
+  return <VirtualCountryList items={items} />;
 }
 
 function VirtualCountryListImpl({ items }: { items: Country[] }) {

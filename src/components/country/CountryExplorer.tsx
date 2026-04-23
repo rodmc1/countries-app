@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import SearchInput from '@/components/country/SearchInput';
 import CountryDetail, { CountryDetailSkeleton } from '@/components/country/CountryDetail';
 import { useCountrySearch, useCountrySearchByFullName, useUserCountry } from '@/hooks/useCountry';
@@ -41,7 +41,7 @@ export default function CountryExplorer() {
     queryClient.refetchQueries({ queryKey: ['countries', 'search'] });
   };
 
-  const displayItems = selectedCountry ? [selectedCountry] : countries;
+  const displayItems = useMemo(() => (selectedCountry ? [selectedCountry] : countries), [selectedCountry, countries]);
 
   return (
     <div className="w-full flex flex-col gap-4">
