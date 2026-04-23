@@ -2,6 +2,11 @@
 
 A countries search app built with React, TanStack Query, Tailwind CSS, and shadcn/ui (base-ui). Search countries by name and view details (flag, coat of arms, currency, driving side) sourced from the [REST Countries API](https://restcountries.com/). On first load, the app uses IP-based geolocation to display the user's own country.
 
+## Live Demo
+- https://countries-app-two-gilt.vercel.app/
+## Documentation (Technical decisions)
+- https://www.notion.so/Country-Explorer-Technical-Decisions-78d0535bff024629b652fd7ca18bd731
+
 ## Features
 
 - Type-ahead search with 500 ms debounce and a virtualised result list
@@ -78,7 +83,7 @@ src/
 ## Architecture Notes
 
 - **Search flow** — `CountryExplorer` owns the query/selection state. `SearchInput` is a controlled combobox built on base-ui that filters synthetic input events from the underlying primitive.
-- **Initial country** — `useUserCountry` chains an IP lookup with a country lookup. `displayedCountry` is derived as `pinnedCountry ?? userCountry`, avoiding `useEffect` for state syncing.
+- **Initial country** — `useUserCountry` chains an IP lookup with a country lookup.
 - **No re-fetch on first render** — the geolocated country is fetched via the `/alpha/{code}` endpoint with all detail fields, so the detail panel can render it directly without an additional `fullText` request.
 - **Pagination** — REST Countries doesn't support pagination, so the result list is virtualised with `@tanstack/react-virtual` to stay performant on large result sets.
 - **Debounce** — search input is debounced 500 ms to avoid hitting the API on every keystroke.
