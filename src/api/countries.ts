@@ -4,8 +4,8 @@ import type { Country, GeojsResponse, IpapiResponse } from '@/types/country';
 const BASE = 'https://restcountries.com/v3.1';
 const FIELDS = 'name,currencies,flags,coatOfArms,car,ccn3';
 
-export async function searchCountriesByName(name: string): Promise<Country[]> {
-  const { data } = await axios.get<Country[]>(`${BASE}/name/${encodeURIComponent(name)}?fields=name,ccn3`);
+export async function searchCountriesByName(name: string, signal?: AbortSignal): Promise<Country[]> {
+  const { data } = await axios.get<Country[]>(`${BASE}/name/${encodeURIComponent(name)}?fields=name,ccn3`, { signal });
   return data;
 }
 

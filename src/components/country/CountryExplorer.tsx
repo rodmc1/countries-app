@@ -7,8 +7,8 @@ import { DataBoundary } from '../shared/DataBoundary';
 import { useQueryClient } from '@tanstack/react-query';
 
 function CountryDetailPanel({ country }: { country: Country }) {
-  const needsFetch = !!country.name.common;
-  const { countryDetail, isFetching } = useCountrySearchByFullName(needsFetch ? country.name.common : '');
+  const needsFetch = !country.flags?.svg;
+  const { countryDetail, isFetching } = useCountrySearchByFullName(country.name.common, needsFetch);
   const display = needsFetch ? countryDetail : country;
 
   if (!display) return <CountryDetailSkeleton />;

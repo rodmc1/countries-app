@@ -18,7 +18,7 @@ export function useCountrySearch(query: string, disabled = false) {
 
   const { data, isFetching, isError, error } = useQuery<Country[]>({
     queryKey: ['countries', 'search', debouncedQuery],
-    queryFn: () => searchCountriesByName(debouncedQuery),
+    queryFn: ({ signal }) => searchCountriesByName(debouncedQuery, signal),
     enabled: !disabled && debouncedQuery.length > 0,
     staleTime: 1000 * 60 * 10,
     retry: false
@@ -32,11 +32,11 @@ export function useCountrySearch(query: string, disabled = false) {
   };
 }
 
-export function useCountrySearchByFullName(query: string) {
+export function useCountrySearchByFullName(query: string, enabled = true) {
   const { data, isFetching, isError, error } = useQuery<Country[]>({
     queryKey: ['countries', 'search', 'fullText', query],
     queryFn: () => getCountryByNameFullText(query),
-    enabled: query.length > 0,
+    enabled: enabled && query.length > 0,
     staleTime: 1000 * 60 * 10,
     retry: false,
     throwOnError: true
