@@ -55,7 +55,7 @@ export default function CountryExplorer() {
         onRetry={handleRetry}
       />
       {displayedCountry && (
-        <DataBoundary fallback={<CountryDetailSkeleton />}>
+        <DataBoundary fallbackSkeleton={<CountryDetailSkeleton />}>
           <CountryDetailPanel country={displayedCountry} />
         </DataBoundary>
       )}

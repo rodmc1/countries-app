@@ -1,6 +1,7 @@
 import { memo, useRef, useState } from 'react';
 import { SearchIcon, XIcon } from 'lucide-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { Combobox as ComboboxPrimitive } from '@base-ui/react';
 import type { Country } from '@/types/country';
 import ErrorView from '@/components/shared/ErrorView';
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem } from '@/components/ui/combobox';
@@ -153,7 +154,7 @@ function VirtualCountryListImpl({ items }: { items: Country[] }) {
   });
 
   return (
-    <div
+    <ComboboxPrimitive.List
       ref={setScrollEl}
       className="max-h-72 overflow-y-auto overscroll-contain p-1 [scrollbar-width:thin] [&::-webkit-scrollbar]:block [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/40 [&::-webkit-scrollbar-track]:bg-muted/30">
       <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
@@ -181,7 +182,7 @@ function VirtualCountryListImpl({ items }: { items: Country[] }) {
           );
         })}
       </div>
-    </div>
+    </ComboboxPrimitive.List>
   );
 }
 
