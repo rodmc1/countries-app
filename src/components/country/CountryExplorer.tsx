@@ -4,7 +4,6 @@ import CountryDetail, { CountryDetailSkeleton } from '@/components/country/Count
 import { useCountrySearch, useCountrySearchByFullName, useUserCountry } from '@/hooks/useCountry';
 import { type Country } from '@/types/country';
 import { DataBoundary } from '../shared/DataBoundary';
-import { useQueryClient } from '@tanstack/react-query';
 
 function CountryDetailPanel({ country }: { country: Country }) {
   const needsFetch = !!country.name.common;
@@ -16,11 +15,10 @@ function CountryDetailPanel({ country }: { country: Country }) {
 }
 
 export default function CountryExplorer() {
-  const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [pinnedCountry, setPinnedCountry] = useState<Country | null>(null);
-  const { countries, isFetching, isError, errorMessage } = useCountrySearch(query, !!selectedCountry);
+  const { countries, isFetching, isError, errorMessage, refetch } = useCountrySearch(query, !!selectedCountry);
   const { country: userCountry } = useUserCountry();
   const displayedCountry = pinnedCountry ?? userCountry;
 
@@ -38,7 +36,7 @@ export default function CountryExplorer() {
   };
 
   const handleRetry = () => {
-    queryClient.refetchQueries({ queryKey: ['countries', 'search'] });
+    refetch();
   };
 
   const displayItems = useMemo(() => (selectedCountry ? [selectedCountry] : countries), [selectedCountry, countries]);

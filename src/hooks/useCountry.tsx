@@ -16,7 +16,7 @@ export function useCountrySearch(query: string, disabled = false) {
   const trimmedQuery = query.trim();
   const [debouncedQuery] = useDebounce(trimmedQuery, 500);
 
-  const { data, isFetching, isError, error } = useQuery<Country[]>({
+  const { data, isFetching, isError, error, refetch } = useQuery<Country[]>({
     queryKey: ['countries', 'search', debouncedQuery],
     queryFn: () => searchCountriesByName(debouncedQuery),
     enabled: !disabled && debouncedQuery.length > 0,
@@ -28,7 +28,8 @@ export function useCountrySearch(query: string, disabled = false) {
     countries: data ?? [],
     isFetching: isFetching && debouncedQuery.length > 0,
     isError,
-    errorMessage: extractErrorMessage(error)
+    errorMessage: extractErrorMessage(error),
+    refetch
   };
 }
 
