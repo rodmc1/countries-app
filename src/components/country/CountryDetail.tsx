@@ -30,7 +30,7 @@ export default function CountryDetail({ country, isLoading }: CountryDetailProps
               key={`flag-${country.name.official}`}
               src={country.flags.svg}
               alt={country.flags.alt ?? `Flag of ${country.name.common}`}
-              fit="cover"
+              fit="contain"
             />
           </DetailField>
 
@@ -114,7 +114,7 @@ function DetailImage({ src, alt, fit }: DetailImageProps) {
       <img
         src={src}
         alt={alt}
-        className={`w-full h-full ${fit === 'cover' ? 'object-cover' : 'object-contain p-3'}`}
+        className={`w-full h-full shadow-xl ${fit === 'cover' ? 'object-cover' : 'object-contain p-3'}`}
         onLoad={() => setLoaded(true)}
       />
     </div>
